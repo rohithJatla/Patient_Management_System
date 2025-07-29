@@ -1,0 +1,10 @@
+POST localhost:4000/patients
+content-Type: application/json
+
+{
+"name":"rohtih jatla",
+"email":"",
+"address":"935 Highlang ave",
+"dateOfBirth":"2001-03-13",
+"registeredDate":"2025-07-29"
+}
