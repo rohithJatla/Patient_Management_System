@@ -5,7 +5,6 @@ import com.rohith.jatla.patient_service.dto.PatientResponseDTO;
 import com.rohith.jatla.patient_service.model.Patient;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 public class PatientMapper {
     public static PatientResponseDTO toPatientResponseDTO(Patient patient) {

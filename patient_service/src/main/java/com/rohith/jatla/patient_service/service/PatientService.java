@@ -2,13 +2,14 @@ package com.rohith.jatla.patient_service.service;
 
 import com.rohith.jatla.patient_service.dto.PatientRequestDTO;
 import com.rohith.jatla.patient_service.dto.PatientResponseDTO;
+import com.rohith.jatla.patient_service.exceptions.EmailAlreadyExistsException;
+import com.rohith.jatla.patient_service.exceptions.PatientNotFoundException;
 import com.rohith.jatla.patient_service.mapper.PatientMapper;
 import com.rohith.jatla.patient_service.model.Patient;
 import com.rohith.jatla.patient_service.repository.PatientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -38,8 +39,41 @@ public class PatientService {
     }
 
     public PatientResponseDTO create(PatientRequestDTO patientRequestDTO) {
+        if (patientRepository.existsByEmail(patientRequestDTO.getEmail())){
+            throw new EmailAlreadyExistsException("A patient with this email already exists"+ patientRequestDTO.getEmail());
+        }
         Patient patient = patientRepository.save(PatientMapper.toPatientModel(patientRequestDTO));
         return PatientMapper.toPatientResponseDTO(patient);
     }
+
+    public PatientResponseDTO update(UUID id, PatientRequestDTO patientRequestDTO) {
+        // Get patient or throw exception
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException("Patient not found with id " + id));
+
+        // Only check email if it's changing
+        if (!patient.getEmail().equals(patientRequestDTO.getEmail()) &&
+                patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
+            throw new EmailAlreadyExistsException("A patient with this email already exists: " + patientRequestDTO.getEmail());
+        }
+
+        // Update fields
+        patient.setName(patientRequestDTO.getName());
+        patient.setEmail(patientRequestDTO.getEmail());
+        patient.setAddress(patientRequestDTO.getAddress());
+        patient.setDateOfBirth(LocalDate.parse(patientRequestDTO.getDateOfBirth()));
+
+        // Save and return
+        Patient savedPatient = patientRepository.save(patient);
+        return PatientMapper.toPatientResponseDTO(savedPatient);
+
+    }
+
+    public void delete(UUID id) {
+        // Maintain Idempotent Delete of REST APIS the goal is
+        // archived if the patient is not present in the database
+       patientRepository.deleteById(id);
+    }
+
 
 }
