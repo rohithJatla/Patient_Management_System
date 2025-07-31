@@ -4,6 +4,7 @@ import com.rohith.jatla.patient_service.dto.PatientRequestDTO;
 import com.rohith.jatla.patient_service.dto.PatientResponseDTO;
 import com.rohith.jatla.patient_service.exceptions.EmailAlreadyExistsException;
 import com.rohith.jatla.patient_service.exceptions.PatientNotFoundException;
+import com.rohith.jatla.patient_service.grpc.BillingServiceGrpcClient;
 import com.rohith.jatla.patient_service.mapper.PatientMapper;
 import com.rohith.jatla.patient_service.model.Patient;
 import com.rohith.jatla.patient_service.repository.PatientRepository;
@@ -18,10 +19,12 @@ import java.util.stream.Collectors;
 public class PatientService {
 //  Can use auto wired insted of constructor injection
 //  @Autowired
-    private PatientRepository patientRepository;
+    private final PatientRepository patientRepository;
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
 
-    public PatientService(PatientRepository patientRepository) {
+    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient) {
         this.patientRepository = patientRepository;
+        this.billingServiceGrpcClient = billingServiceGrpcClient;
     }
 
     public Patient findById(UUID id) {
@@ -43,6 +46,12 @@ public class PatientService {
             throw new EmailAlreadyExistsException("A patient with this email already exists"+ patientRequestDTO.getEmail());
         }
         Patient patient = patientRepository.save(PatientMapper.toPatientModel(patientRequestDTO));
+
+        billingServiceGrpcClient.createBillingAccount(
+                patient.getID().toString(),
+                patient.getName(),
+                patient.getEmail()
+        );
         return PatientMapper.toPatientResponseDTO(patient);
     }
 
