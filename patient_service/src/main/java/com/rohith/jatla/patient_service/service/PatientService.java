@@ -5,6 +5,7 @@ import com.rohith.jatla.patient_service.dto.PatientResponseDTO;
 import com.rohith.jatla.patient_service.exceptions.EmailAlreadyExistsException;
 import com.rohith.jatla.patient_service.exceptions.PatientNotFoundException;
 import com.rohith.jatla.patient_service.grpc.BillingServiceGrpcClient;
+import com.rohith.jatla.patient_service.kafka.kafkaProducer;
 import com.rohith.jatla.patient_service.mapper.PatientMapper;
 import com.rohith.jatla.patient_service.model.Patient;
 import com.rohith.jatla.patient_service.repository.PatientRepository;
@@ -21,10 +22,12 @@ public class PatientService {
 //  @Autowired
     private final PatientRepository patientRepository;
     private final BillingServiceGrpcClient billingServiceGrpcClient;
+    private final kafkaProducer kafkaProducer;
 
-    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient) {
+    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient, kafkaProducer kafkaProducer) {
         this.patientRepository = patientRepository;
         this.billingServiceGrpcClient = billingServiceGrpcClient;
+        this.kafkaProducer = kafkaProducer;
     }
 
     public Patient findById(UUID id) {
@@ -52,6 +55,7 @@ public class PatientService {
                 patient.getName(),
                 patient.getEmail()
         );
+        kafkaProducer.sendEvent(patient);
         return PatientMapper.toPatientResponseDTO(patient);
     }
 
