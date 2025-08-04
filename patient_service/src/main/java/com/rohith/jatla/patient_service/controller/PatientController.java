@@ -1,4 +1,4 @@
-package com.rohith.jatla.patient_service.controllers;
+package com.rohith.jatla.patient_service.controller;
 
 import com.rohith.jatla.patient_service.dto.PatientRequestDTO;
 import com.rohith.jatla.patient_service.dto.PatientResponseDTO;
