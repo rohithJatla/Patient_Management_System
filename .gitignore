@@ -22,3 +22,22 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+.idea/
+
+target/
+infrastructure.iml
+analytics_service/analytics_service.iml
+analytics_service/HELP.md
+api_gateway/HELP.md
+api_gateway/src/main/resources/application-prod.yml
+auth_service/auth_service.iml
+auth_service/HELP.md
+billing_service/HELP.md
+infrastructure/localstack_deploy.sh
+infrastructure/pom.xml
+infrastructure/cdk.out/cdk.out
+infrastructure/cdk.out/localstack.template.json
+infrastructure/cdk.out/manifest.json
+infrastructure/cdk.out/tree.json
+infrastructure/src/main/java/com/rohith/jatla/stack/LocalStack.java
+patient_service/HELP.md
